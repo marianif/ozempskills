@@ -1,0 +1,11 @@
+{
+  "name": "ozempskills",
+  "description": "Meta-skill that routes other skill invocations through a token-compressing cache: before a skill is invoked, resolves its real source file, compresses the instructional body (frontmatter and all structurally load-bearing content preserved verbatim), and caches the result so repeat invocations cost fewer tokens.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Federica Mariani"
+  },
+  "repository": "https://github.com/marianif/ozempskills",
+  "license": "Apache-2.0",
+  "skills": "./skill/"
+}
