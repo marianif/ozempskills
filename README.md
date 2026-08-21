@@ -36,6 +36,16 @@ Before another skill `X` is invoked, ozempskills runs first:
 5. Hands back the compressed version for Claude to follow instead of `X`'s full
    original.
 
+Some skills conditionally load other files by relative path — a reference doc, an
+agent definition — from within their SKILL.md body (e.g. "if mobile, load
+`reference/mobile/audit.md`"). When such a load instruction actually fires during
+a task, ozempskills compresses that referenced file the same way, under the same
+license check and the same never-alter rules, and caches it separately. This never
+extends to scripts or any other executable/data file a skill ships — only plain
+prose meant for a model to read. Compressing code can silently change what it
+does, and code's file size doesn't cost conversation tokens the way loaded prose
+does, so there's neither a safety margin nor a savings case for touching it.
+
 A short standing instruction in `CLAUDE.md` is what makes this happen automatically
 — it steers Claude's own tool-choice reasoning to check ozempskills first, for both
 explicit `/X` invocations and autonomous skill matching.

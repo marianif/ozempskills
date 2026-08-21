@@ -1,6 +1,6 @@
 ---
 name: ozempskills
-description: "Internal meta-skill. Never match this from conversation content — it is only ever invoked by the routing rule in CLAUDE.md, right before some other skill X would be invoked. Given a target skill name, resolves that skill's real source file on disk, returns a token-compressed version of its instructions (with frontmatter preserved verbatim) for Claude to follow in place of invoking X directly, caching the result until X's source changes."
+description: "Internal meta-skill. Never match this from conversation content — it is only ever invoked by the routing rule in CLAUDE.md, right before some other skill X would be invoked. Given a target skill name, resolves that skill's real source file on disk, returns a token-compressed version of its instructions (with frontmatter preserved verbatim) for Claude to follow in place of invoking X directly, caching the result until X's source changes. Also compresses any prose reference/agent files X's SKILL.md conditionally loads, on the same terms — executable scripts are never touched."
 argument-hint: "<target-skill-name>"
 user-invocable: false
 allowed-tools:
@@ -173,7 +173,58 @@ Write the result to `~/.claude/skills/ozempskills/cache/<key>.json`:
 }
 ```
 
-## Step 7 — Apply, with the permission-boundary warning
+## Step 7 — Referenced prose files (reference/*.md, agents/*.md)
+
+SKILL.md often conditionally loads other files by relative path — e.g. "if the
+surface is mobile, load `reference/mobile/audit.md` — non-negotiable." Step 6
+requires that instruction (trigger + path) to survive compression untouched. This
+step covers what happens when that instruction actually fires during a task.
+
+**In scope:** files that are themselves prose meant for a model to read and follow
+— reference docs, agent definition files (e.g. `agents/*.md`), or any other file
+the skill loads specifically to give Claude more instructions or context.
+
+**Never in scope, under any circumstance:** anything that is executed rather than
+read — scripts (`.mjs`, `.js`, `.py`, `.sh`, any file invoked via `Bash` or another
+tool), config/data files (`.json`, `.yaml` used as machine input, not instruction),
+binaries, images, or any file whose bytes matter for correctness rather than
+meaning. Compressing code can silently change behavior — a rewritten loop or
+renamed variable is not equivalent to its original the way paraphrased prose is —
+and code's byte-for-byte size doesn't cost conversation tokens the way loaded
+prose does, so there is no token-savings case for touching it. If a conditional
+load instruction points at anything other than a plain prose/markdown file, leave
+it completely alone; do not attempt to identify a "prose portion" of a code file.
+
+**When a conditional load instruction fires**, before reading the referenced file
+directly, run it through this exact same procedure, scoped to that file instead of
+SKILL.md:
+
+1. Resolve its path relative to the already-resolved skill source directory (no
+   separate discovery search needed — the path came from the skill's own body).
+2. Run the Step 2 license check again for this file specifically — a skill's
+   overall `license` field is presumed to cover its own reference files, but if
+   this file carries its own distinct license/attribution notice (some multi-file
+   skills do, especially forked ones), that notice governs instead and must be
+   checked and carried forward the same way.
+3. Cache key: same scheme as Step 3, using this file's own resolved absolute path
+   (not SKILL.md's) — `sha256(<resolved path>)[:16]__<skill-name>__<relative-path-slug>.json`.
+   This keeps a skill's multiple reference files from colliding with each other or
+   with its own SKILL.md cache entry.
+4. Check cache, triage, and compress under the exact same never-alter / eligible-to-
+   cut rules as Step 5 and Step 6. This file has no frontmatter block to preserve
+   separately (unless it happens to have its own), so the whole file is body for
+   the purposes of these rules.
+5. Cache format is the same shape as Step 6's, with `skill_name` recording both the
+   parent skill and this file's relative path (e.g. `"flow / reference/mobile/audit.md"`).
+
+Present the compressed version of that referenced file in place of its original
+when the task actually reaches the point of needing it — do not eagerly compress
+every reference file a skill has up front; only the ones a given task's
+conditional-load instructions actually trigger. Most skills' reference trees are
+larger than what any single task needs, and eagerly compressing all of it wastes
+effort on branches that were never going to be read this time.
+
+## Step 8 — Apply, with the permission-boundary warning
 
 Present the frontmatter (verbatim) and the compressed/cached body as the
 instructions to follow for the rest of this task, in place of invoking `<name>` via
@@ -185,12 +236,17 @@ for `<name>` via ozempskills; the harness did not parse `<name>`'s real
 patterns listed in it for the rest of this task."** Then actually honor that
 self-imposed restriction for the remainder of the task — treat that skill's
 `allowed-tools` list as a ceiling on your own tool use, the same way the harness
-would have enforced it had the skill been invoked directly.
+would have enforced it had the skill been invoked directly. This ceiling applies
+for the whole task, including whenever Step 7 substitutes a compressed reference
+file in later on — it is not re-derived per file.
 
 ## Notes
 
 - The `cache/` directory is never auto-pruned. It's always safe to delete its
   contents entirely — entries regenerate lazily on next use.
+- Scripts and other executable files are never compressed, cached, or rewritten —
+  see Step 7. Only SKILL.md and the prose files it conditionally loads are ever
+  in scope.
 - Discovery's root priority (project > user > plugin) is a reasonable inference,
   not a verified match to Claude Code's internal resolution order. If a project ever
   defines a skill with the same name as an installed plugin's skill, be aware
