@@ -127,17 +127,6 @@ tests/SCENARIOS.md          # behavioral runbook (requires live agent)
 - `npm test` runs `tests/structure.test.mjs` — deterministic checks: frontmatter parses, `plugin.json`/`marketplace.json` agree, every numbered step exists, never-alter list names load-bearing exclusions, cache-entry schema stays in sync.
 - `tests/SCENARIOS.md` — behavioral scenarios (cold compression, warm hit, staleness, license gate, not-found fallback, self-routing guard, referenced-file compression, project-shadows-plugin resolution) with pass/fail criteria. Requires a live agent + real installed skills, so documented as a runbook, not automated.
 
-## SEO & discoverability
-
-This repo targets: _Claude Code skill compression_, _reduce prompt tokens in SKILL.md_, _context window optimization for LLM agents_, _Anthropic Claude skill optimizer_.
-
-Recommended GitHub **About** tagline (Settings → General):
-
-> _Trim the fat from your Claude Code context window. Automate SKILL.md token optimization and compression by 40%+ while preserving execution steps._
-
-Recommended **Topics** (Settings → About → Topics):
-`claude-code`, `claude-skills`, `prompt-engineering`, `token-optimization`, `anthropic`, `context-window`, `markdown-optimizer`, `llm`, `mcp`
-
 ## License
 
 Apache-2.0 — see [LICENSE](./LICENSE).
