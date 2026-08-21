@@ -1,7 +1,7 @@
 {
   "name": "ozempskills",
   "version": "0.1.0",
-  "description": "Meta-skill that routes other skill invocations through a token-compressing cache.",
+  "description": "Claude Code skill compression — trim SKILL.md tokens and optimize context window. Meta-skill that routes other skills through a license-checked, caching compressor preserving frontmatter and steps verbatim.",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",

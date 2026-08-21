@@ -2,7 +2,7 @@
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "ozempskills",
   "metadata": {
-    "description": "Meta-skill that compresses other skills' instructions to cut token cost on repeat invocations, while preserving frontmatter and behavior-relevant content verbatim."
+    "description": "Claude Code skill compression — reduce prompt tokens in SKILL.md and optimize context window. Meta-skill that compresses other skills' instructions into a license-checked cache, preserving frontmatter and behavior-relevant content verbatim."
   },
   "owner": {
     "name": "Federica Mariani"
@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "ozempskills",
-      "description": "Routes skill invocations through a token-compressing cache: resolves a target skill's real source file, compresses its instructional body (frontmatter and all decision-relevant content preserved verbatim), and caches the result so repeat invocations of that skill cost fewer tokens.",
+      "description": "Claude Code skill compression — trim SKILL.md tokens and optimize your context window. Routes skill invocations through a license-checked cache: resolves the real source file, compresses the instructional body preserving frontmatter and steps verbatim, so repeat invocations cost fewer tokens.",
       "version": "0.1.0",
       "author": {
         "name": "Federica Mariani"
@@ -18,11 +18,14 @@
       "source": "./",
       "category": "productivity",
       "tags": [
-        "meta",
-        "tokens",
+        "claude-code",
+        "claude-skills",
+        "token-optimization",
+        "context-window",
         "compression",
-        "skills",
-        "efficiency"
+        "prompt-engineering",
+        "markdown-optimizer",
+        "anthropic"
       ]
     }
   ]

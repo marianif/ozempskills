@@ -1,6 +1,6 @@
 {
   "name": "ozempskills",
-  "description": "Meta-skill that routes other skill invocations through a token-compressing cache: before a skill is invoked, resolves its real source file, compresses the instructional body (frontmatter and all structurally load-bearing content preserved verbatim), and caches the result so repeat invocations cost fewer tokens.",
+  "description": "Claude Code skill compression for SKILL.md — trim the fat from your context window. Routes other skills through a license-checked, caching compressor: resolves the real source file, compresses the instructional body while preserving frontmatter, allowed-tools and steps verbatim, and caches for repeat invocations.",
   "version": "0.1.0",
   "author": {
     "name": "Federica Mariani"
