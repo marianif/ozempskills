@@ -127,6 +127,24 @@ Compressed cache entries live at `~/.claude/skills/ozempskills/cache/` regardles
 of where ozempskills itself is installed. Deleting that directory's contents is
 always safe — entries regenerate lazily on next use.
 
+## Testing
+
+There's no executable logic here to unit-test in the conventional sense — the
+"behavior" is a markdown procedure a model follows, not a function. Two layers
+instead:
+
+- `npm test` runs `tests/structure.test.mjs` — static, deterministic checks that
+  the package is well-formed: frontmatter parses, `plugin.json`/`marketplace.json`
+  agree with each other, every numbered step referenced in the doc actually
+  exists, the never-alter list still names the load-bearing exclusions, and the
+  example cache-entry schema stays in sync with what the procedure text refers to.
+- `tests/SCENARIOS.md` — a fixed set of behavioral scenarios (cold compression,
+  warm cache hit, staleness detection, the license gate, the not-found fallback,
+  the self-routing guard, referenced-file compression, and project-shadows-plugin
+  resolution) with concrete, checkable pass/fail criteria. These need a live agent
+  and real installed skills to run, so they're documented as a runbook rather than
+  automated — hand the file to an agent, or run it by hand, and check each box.
+
 ## License
 
 Apache License 2.0 — see [LICENSE](./LICENSE).
