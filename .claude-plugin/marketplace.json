@@ -11,7 +11,7 @@
     {
       "name": "ozempskills",
       "description": "Claude Code skill compression — trim SKILL.md tokens and optimize your context window. Routes skill invocations through a license-checked cache: resolves the real source file, compresses the instructional body preserving frontmatter and steps verbatim, so repeat invocations cost fewer tokens.",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "author": {
         "name": "Federica Mariani"
       },
