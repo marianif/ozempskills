@@ -195,6 +195,11 @@ prose does, so there is no token-savings case for touching it. If a conditional
 load instruction points at anything other than a plain prose/markdown file, leave
 it completely alone; do not attempt to identify a "prose portion" of a code file.
 
+> **No session shortcut here.** CLAUDE.md's "once per skill per session" exception
+> is about skill *names*, not files. It never applies to Step 7. The only valid
+> skip is a cache **hit** on this file's own key (Step 7.4) — not "I already did
+> this skill earlier."
+
 **When a conditional load instruction fires**, before reading the referenced file
 directly, run it through this exact same procedure, scoped to that file instead of
 SKILL.md:
