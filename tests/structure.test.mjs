@@ -171,6 +171,38 @@ describe('Cache entry schema in the doc', () => {
   });
 });
 
+describe('Multi-provider build output', () => {
+  const providerSkillPaths = {
+    'claude-code': join(ROOT, '.claude', 'skills', 'ozempskills', 'SKILL.md'),
+    cursor: join(ROOT, '.cursor', 'skills', 'ozempskills', 'SKILL.md'),
+  };
+
+  for (const [provider, skillPath] of Object.entries(providerSkillPaths)) {
+    it(`${provider}'s generated SKILL.md is byte-for-byte identical to skill/SKILL.md`, () => {
+      const generated = readFileSync(skillPath, 'utf8');
+      assert.equal(
+        generated,
+        skillMd,
+        `run \`npm run build\` — ${provider}'s copy is out of sync with skill/SKILL.md`
+      );
+    });
+  }
+
+  it('CLAUDE.md and AGENTS.md carry the identical routing instruction', () => {
+    const claudeMd = readFileSync(join(ROOT, 'CLAUDE.md'), 'utf8');
+    const agentsMd = readFileSync(join(ROOT, 'AGENTS.md'), 'utf8');
+    assert.equal(claudeMd, agentsMd, 'CLAUDE.md and AGENTS.md should carry the same routing block');
+  });
+
+  it('the routing file names ozempskills and every stated exception', () => {
+    const routing = readFileSync(join(ROOT, 'AGENTS.md'), 'utf8');
+    assert.match(routing, /ozempskills/);
+    assert.match(routing, /already executing ozempskills/);
+    assert.match(routing, /already routed through ozempskills/);
+    assert.match(routing, /reported "not found"/);
+  });
+});
+
 describe('Package manifests agree with each other', () => {
   it('plugin.json and marketplace.json declare the same name', () => {
     assert.equal(pluginJson.name, marketplaceJson.plugins[0].name);

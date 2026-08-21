@@ -4,11 +4,12 @@
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Claude Code Plugin Ready](https://img.shields.io/badge/Claude_Code-Plugin_Ready-blueviolet)](#-quick-start)
+[![Cursor Ready](https://img.shields.io/badge/Cursor-Ready-000000)](#-quick-start)
 [![Skills](https://img.shields.io/badge/Skills-Optimized-0e7a6e)](#how-it-compresses)
 
 **Claude Code skill compression for `SKILL.md` — reduce prompt tokens and optimize your context window without losing steps.**
 
-`ozempskills` is a skill for Claude Code that routes other skill invocations through a token-compressing cache. Before another skill `X` runs, it resolves `X`'s real source file, compresses the instructional body (cutting redundant prose while preserving execution logic), and caches the result — so every repeat invocation costs fewer tokens.
+`ozempskills` is a skill for Claude Code and Cursor that routes other skill invocations through a token-compressing cache. Before another skill `X` runs, it resolves `X`'s real source file, compresses the instructional body (cutting redundant prose while preserving execution logic), and caches the result — so every repeat invocation costs fewer tokens.
 
 _Keywords: Claude Code skill compression, reduce prompt tokens in SKILL.md, context window optimization for LLM agents, Anthropic Claude skill optimizer._
 
@@ -48,7 +49,7 @@ Frontmatter, `allowed-tools`, file paths, `{{template}}` tokens, code blocks, an
 
 ---
 
-## ⚡ Quick Start
+## ⚡ Quick Start (Claude Code & Cursor)
 
 ### 1. Install as a Claude Code plugin
 
@@ -59,9 +60,27 @@ Frontmatter, `allowed-tools`, file paths, `{{template}}` tokens, code blocks, an
 
 Or manual install: place `skill/` under `.claude/skills/ozempskills/` (project or `~/.claude/skills/`).
 
-### 2. Add the routing instruction to `CLAUDE.md`
+### 1b. Cursor (or any harness that reads a `skills/<name>/SKILL.md` convention)
 
-This is what makes compression automatic for both `/X` and autonomous skill matching:
+`skill/SKILL.md` has no Claude-specific templating — it's plain frontmatter + prose,
+and Cursor's own skill convention (`.cursor/skills/<name>/SKILL.md`) accepts the same
+fields Claude Code does. So the file installs verbatim, unchanged:
+
+```bash
+npm run build
+```
+
+This copies `skill/` to `.claude/skills/ozempskills/` and `.cursor/skills/ozempskills/`
+(see [`scripts/build.mjs`](./scripts/build.mjs)). Re-run it after editing
+`skill/SKILL.md` — the two installed copies are generated output, not source.
+Adding another harness that shares this same `skills/<name>/SKILL.md` layout is a
+one-line addition to `PROVIDERS` in that script.
+
+### 2. Add the routing instruction
+
+This is what makes compression automatic for both `/X` and autonomous skill matching.
+Claude Code reads `CLAUDE.md`; Cursor reads `AGENTS.md` at the project root — both
+files carry the identical routing block (see [`AGENTS.md`](./AGENTS.md)):
 
 ```markdown
 ## Skill routing through ozempskills
@@ -115,7 +134,12 @@ For a one-off in one session, asking directly is simpler. `ozempskills` earns it
 ## Repository layout
 
 ```
-skill/SKILL.md              # the meta-skill itself
+skill/SKILL.md              # the meta-skill itself (source of truth)
+scripts/build.mjs           # copies skill/ into each provider's skills/ dir
+.claude/skills/ozempskills/ # generated — Claude Code install
+.cursor/skills/ozempskills/ # generated — Cursor install
+CLAUDE.md                   # routing rule, Claude Code convention
+AGENTS.md                   # routing rule, Cursor convention (identical content)
 .claude-plugin/plugin.json
 .claude-plugin/marketplace.json
 tests/structure.test.mjs    # static well-formedness checks
